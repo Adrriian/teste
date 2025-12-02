@@ -29,7 +29,7 @@ loginBtn.addEventListener("click", async () => {
     const uid = userCredential.user.uid;
 
     // Pega dados do Firestore
-    const docRef = db.collection("usuarios").doc(uid);
+    const docRef = db.collection("consultores").doc(uid);
     const docSnap = await docRef.get();
 
     if (docSnap.exists) {
@@ -41,3 +41,4 @@ loginBtn.addEventListener("click", async () => {
     console.error("Erro no login:", error.message);
   }
 });
+
