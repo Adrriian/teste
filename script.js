@@ -1,6 +1,3 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -47,3 +44,4 @@ loginBtn.addEventListener("click", async () => {
     console.error("Erro no login:", error.message);
   }
 });
+
