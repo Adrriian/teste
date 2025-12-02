@@ -1,7 +1,6 @@
-// Import Firebase
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -19,55 +18,32 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Elementos
+// Seleciona elementos
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
-const msg = document.getElementById("msg");
 
-// Função para cadastrar usuário
-signupBtn.addEventListener("click", async () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
-
-    // Cria documento do usuário no Firestore
-    await setDoc(doc(db, "usuarios", uid), { email });
-
-    msg.style.color = "green";
-    msg.textContent = "Usuário cadastrado com sucesso!";
-  } catch (error) {
-    msg.style.color = "red";
-    msg.textContent = error.message;
-  }
-});
-
-// Função para login
+// Função de login
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value;
   const password = passwordInput.value;
 
   try {
+    // 1️⃣ Loga no Firebase Auth
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const uid = userCredential.user.uid;
 
-    // Puxa dados do Firestore
+    // 2️⃣ Pega dados do Firestore
     const docRef = doc(db, "usuarios", uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      msg.style.color = "green";
-      msg.textContent = `Login realizado! Bem-vindo(a), ${docSnap.data().email}`;
+      console.log("Dados do usuário:", docSnap.data());
     } else {
-      msg.style.color = "red";
-      msg.textContent = "Usuário não encontrado no Firestore!";
+      console.log("Usuário logado mas sem dados no Firestore!");
     }
+
   } catch (error) {
-    msg.style.color = "red";
-    msg.textContent = error.message;
+    console.error("Erro no login:", error.message);
   }
 });
