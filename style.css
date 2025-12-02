@@ -8,7 +8,7 @@ body {
     margin: 0;
 }
 
-.login-container {
+.container {
     background-color: #fff;
     padding: 30px;
     border-radius: 10px;
@@ -17,15 +17,15 @@ body {
     text-align: center;
 }
 
-.login-container input {
+input {
     width: 90%;
     padding: 10px;
-    margin: 10px 0;
+    margin: 8px 0;
     border-radius: 5px;
     border: 1px solid #ccc;
 }
 
-.login-container button {
+button {
     width: 95%;
     padding: 10px;
     background-color: #0077ff;
@@ -35,12 +35,11 @@ body {
     cursor: pointer;
 }
 
-.login-container button:hover {
+button:hover {
     background-color: #005ecc;
 }
 
 .msg {
     margin-top: 10px;
-    color: red;
     font-weight: bold;
 }
