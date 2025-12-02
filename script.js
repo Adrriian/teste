@@ -1,49 +1,100 @@
-const btn = document.querySelector('.login_button');
-const msg = document.querySelector('.msg');
+// Substitua pela sua Publishable Client Key do Neon Auth
+const PUBLISHABLE_KEY = "SUA_PUBLICABLE_CLIENT_KEY";
 
-btn.addEventListener('click', login);
+// URLs do Neon Auth
+const SIGNUP_URL = `https://api.neon-auth.com/v1/signup`;
+const LOGIN_URL = `https://api.neon-auth.com/v1/signin`;
 
-async function login() {
-    const email = document.querySelector('.email').value;
-    const password = document.querySelector('.password').value;
+const signupBtn = document.getElementById("signup-btn");
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
 
-    if (!email || !password) {
-        msg.style.color = "red";
-        msg.textContent = "Preencha todos os campos!";
-        return;
-    }
+signupBtn.addEventListener("click", async () => {
+    const name = document.getElementById("signup-name").value;
+    const email = document.getElementById("signup-email").value;
+    const password = document.getElementById("signup-password").value;
+    const msg = document.getElementById("signup-msg");
 
     try {
-        // Endpoint real da tabela users
-        const response = await fetch('https://ep-wandering-leaf-aczo2o7g.apirest.sa-east-1.aws.neon.tech/neondb/rest/v1/users?select=*', {
-            method: 'GET',
+        const res = await fetch(SIGNUP_URL, {
+            method: "POST",
             headers: {
-                'apikey': 'napi_h1oxultl93gyplfy9bxw6titnf8x46a3jxlk1k2idu3iw2e4m1l32k6ot3cwldz0',
-                'Content-Type': 'application/json'
-            }
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${PUBLISHABLE_KEY}`
+            },
+            body: JSON.stringify({ name, email, password })
         });
 
-        const users = await response.json();
+        const data = await res.json();
 
-        // Verifica se o usuário existe
-        const user = users.find(u => u.email === email && u.senha === password);
-
-        if (user) {
+        if (res.ok) {
             msg.style.color = "green";
-            msg.textContent = `Bem-vindo, ${user.nome}!`;
-            // Salvar no localStorage
-            localStorage.setItem("userEmail", user.email);
-            localStorage.setItem("userName", user.nome);
-            // Redirecionar se quiser
-            // window.location.href = "dashboard.html";
+            msg.textContent = "Usuário cadastrado com sucesso!";
         } else {
             msg.style.color = "red";
-            msg.textContent = "Email ou senha incorretos!";
+            msg.textContent = data.error || "Erro no cadastro";
         }
-
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
         msg.style.color = "red";
-        msg.textContent = "Erro ao conectar com o banco de dados!";
+        msg.textContent = "Erro na conexão com Neon Auth";
+        console.error(err);
     }
+});
+
+loginBtn.addEventListener("click", async () => {
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    const msg = document.getElementById("login-msg");
+
+    try {
+        const res = await fetch(LOGIN_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${PUBLISHABLE_KEY}`
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msg.style.color = "green";
+            msg.textContent = "Login realizado com sucesso!";
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("userName", data.user.name);
+            showDashboard(data.user.name);
+        } else {
+            msg.style.color = "red";
+            msg.textContent = data.error || "Erro no login";
+        }
+    } catch (err) {
+        msg.style.color = "red";
+        msg.textContent = "Erro na conexão com Neon Auth";
+        console.error(err);
+    }
+});
+
+logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("signup-form").style.display = "block";
+    document.getElementById("login-form").style.display = "block";
+});
+
+function showDashboard(name) {
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("welcome-msg").textContent = `Bem-vindo, ${name}!`;
+    document.getElementById("signup-form").style.display = "none";
+    document.getElementById("login-form").style.display = "none";
 }
+
+// Verifica se já está logado
+window.onload = () => {
+    const token = localStorage.getItem("token");
+    const name = localStorage.getItem("userName");
+    if (token && name) {
+        showDashboard(name);
+    }
+};
