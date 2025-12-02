@@ -1,101 +1,73 @@
-// Substitua pela sua Publishable Client Key do Neon Auth
-const PUBLISHABLE_KEY = "pck_gzfvbf2a5b5fgdevaqf9jh414jgz9p5t97n02v39fp5er";
+// Import Firebase
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
-// URLs do Neon Auth
-const SIGNUP_URL = `https://api.neon-auth.com/v1/signup`;
-const LOGIN_URL = `https://api.neon-auth.com/v1/signin`;
-
-const signupBtn = document.getElementById("signup-btn");
-const loginBtn = document.getElementById("login-btn");
-const logoutBtn = document.getElementById("logout-btn");
-
-signupBtn.addEventListener("click", async () => {
-    const name = document.getElementById("signup-name").value;
-    const email = document.getElementById("signup-email").value;
-    const password = document.getElementById("signup-password").value;
-    const msg = document.getElementById("signup-msg");
-
-    try {
-        const res = await fetch(SIGNUP_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${PUBLISHABLE_KEY}`
-            },
-            body: JSON.stringify({ name, email, password })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            msg.style.color = "green";
-            msg.textContent = "Usuário cadastrado com sucesso!";
-        } else {
-            msg.style.color = "red";
-            msg.textContent = data.error || "Erro no cadastro";
-        }
-    } catch (err) {
-        msg.style.color = "red";
-        msg.textContent = "Erro na conexão com Neon Auth";
-        console.error(err);
-    }
-});
-
-loginBtn.addEventListener("click", async () => {
-    const email = document.getElementById("login-email").value;
-    const password = document.getElementById("login-password").value;
-    const msg = document.getElementById("login-msg");
-
-    try {
-        const res = await fetch(LOGIN_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${PUBLISHABLE_KEY}`
-            },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            msg.style.color = "green";
-            msg.textContent = "Login realizado com sucesso!";
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("userName", data.user.name);
-            showDashboard(data.user.name);
-        } else {
-            msg.style.color = "red";
-            msg.textContent = data.error || "Erro no login";
-        }
-    } catch (err) {
-        msg.style.color = "red";
-        msg.textContent = "Erro na conexão com Neon Auth";
-        console.error(err);
-    }
-});
-
-logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("signup-form").style.display = "block";
-    document.getElementById("login-form").style.display = "block";
-});
-
-function showDashboard(name) {
-    document.getElementById("dashboard").style.display = "block";
-    document.getElementById("welcome-msg").textContent = `Bem-vindo, ${name}!`;
-    document.getElementById("signup-form").style.display = "none";
-    document.getElementById("login-form").style.display = "none";
-}
-
-// Verifica se já está logado
-window.onload = () => {
-    const token = localStorage.getItem("token");
-    const name = localStorage.getItem("userName");
-    if (token && name) {
-        showDashboard(name);
-    }
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDGgk0mDtYN4V7lsGqni3buCJ2cN03jccU",
+  authDomain: "vistoria-18512.firebaseapp.com",
+  projectId: "vistoria-18512",
+  storageBucket: "vistoria-18512.firebasestorage.app",
+  messagingSenderId: "686144622304",
+  appId: "1:686144622304:web:cfa35ba985568d44d10a85",
+  measurementId: "G-M5DYEBN29V"
 };
 
+// Inicializa Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Elementos
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const msg = document.getElementById("msg");
+
+// Função para cadastrar usuário
+signupBtn.addEventListener("click", async () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = userCredential.user.uid;
+
+    // Cria documento do usuário no Firestore
+    await setDoc(doc(db, "usuarios", uid), { email });
+
+    msg.style.color = "green";
+    msg.textContent = "Usuário cadastrado com sucesso!";
+  } catch (error) {
+    msg.style.color = "red";
+    msg.textContent = error.message;
+  }
+});
+
+// Função para login
+loginBtn.addEventListener("click", async () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const uid = userCredential.user.uid;
+
+    // Puxa dados do Firestore
+    const docRef = doc(db, "usuarios", uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      msg.style.color = "green";
+      msg.textContent = `Login realizado! Bem-vindo(a), ${docSnap.data().email}`;
+    } else {
+      msg.style.color = "red";
+      msg.textContent = "Usuário não encontrado no Firestore!";
+    }
+  } catch (error) {
+    msg.style.color = "red";
+    msg.textContent = error.message;
+  }
+});
