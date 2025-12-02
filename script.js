@@ -1,5 +1,4 @@
-
-// Configuração do Firebase
+// Inicializa Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDGgk0mDtYN4V7lsGqni3buCJ2cN03jccU",
   authDomain: "vistoria-18512.firebaseapp.com",
@@ -10,38 +9,35 @@ const firebaseConfig = {
   measurementId: "G-M5DYEBN29V"
 };
 
-// Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
 
-// Seleciona elementos
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Elementos
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
 
-// Função de login
+// Login
 loginBtn.addEventListener("click", async () => {
   const email = emailInput.value;
   const password = passwordInput.value;
 
   try {
-    // 1️⃣ Loga no Firebase Auth
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const uid = userCredential.user.uid;
 
-    // 2️⃣ Pega dados do Firestore
-    const docRef = doc(db, "usuarios", uid);
-    const docSnap = await getDoc(docRef);
+    // Pega dados do Firestore
+    const docRef = db.collection("usuarios").doc(uid);
+    const docSnap = await docRef.get();
 
-    if (docSnap.exists()) {
+    if (docSnap.exists) {
       console.log("Dados do usuário:", docSnap.data());
     } else {
-      console.log("Usuário logado mas sem dados no Firestore!");
+      console.log("Usuário logado, mas sem dados no Firestore!");
     }
-
   } catch (error) {
     console.error("Erro no login:", error.message);
   }
 });
-
