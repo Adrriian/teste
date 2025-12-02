@@ -8,13 +8,14 @@ async function login() {
     const password = document.querySelector('.password').value;
 
     if (!email || !password) {
+        msg.style.color = "red";
         msg.textContent = "Preencha todos os campos!";
         return;
     }
 
     try {
-        // Substitua pelo endpoint da sua tabela de usuários no Neon
-        const response = await fetch('https://seu-endpoint-neon/rest/v1/usuarios?select=*', {
+        // Endpoint real da tabela users
+        const response = await fetch('https://ep-wandering-leaf-aczo2o7g.apirest.sa-east-1.aws.neon.tech/neondb/rest/v1/users?select=*', {
             method: 'GET',
             headers: {
                 'apikey': 'napi_h1oxultl93gyplfy9bxw6titnf8x46a3jxlk1k2idu3iw2e4m1l32k6ot3cwldz0',
@@ -29,8 +30,11 @@ async function login() {
 
         if (user) {
             msg.style.color = "green";
-            msg.textContent = "Login realizado com sucesso!";
-            // Aqui você pode redirecionar, por exemplo:
+            msg.textContent = `Bem-vindo, ${user.nome}!`;
+            // Salvar no localStorage
+            localStorage.setItem("userEmail", user.email);
+            localStorage.setItem("userName", user.nome);
+            // Redirecionar se quiser
             // window.location.href = "dashboard.html";
         } else {
             msg.style.color = "red";
@@ -39,7 +43,7 @@ async function login() {
 
     } catch (error) {
         console.error(error);
+        msg.style.color = "red";
         msg.textContent = "Erro ao conectar com o banco de dados!";
     }
 }
-
