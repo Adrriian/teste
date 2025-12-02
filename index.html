@@ -3,16 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Neon Teste</title>
+    <title>Neon Auth Demo</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="login-container">
-        <h1>Login</h1>
-        <input type="email" class="email" placeholder="Email">
-        <input type="password" class="password" placeholder="Senha">
-        <button class="login_button">Entrar</button>
-        <p class="msg"></p>
+    <div class="container">
+        <h1>Neon Auth Demo</h1>
+
+        <div class="form" id="signup-form">
+            <h2>Cadastrar</h2>
+            <input type="text" id="signup-name" placeholder="Nome">
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-password" placeholder="Senha">
+            <button id="signup-btn">Cadastrar</button>
+            <p class="msg" id="signup-msg"></p>
+        </div>
+
+        <div class="form" id="login-form">
+            <h2>Login</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Senha">
+            <button id="login-btn">Entrar</button>
+            <p class="msg" id="login-msg"></p>
+        </div>
+
+        <div id="dashboard" style="display:none;">
+            <h2>Dashboard</h2>
+            <p id="welcome-msg"></p>
+            <button id="logout-btn">Sair</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
