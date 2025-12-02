@@ -17,7 +17,7 @@ async function login() {
         const response = await fetch('https://seu-endpoint-neon/rest/v1/usuarios?select=*', {
             method: 'GET',
             headers: {
-                'apikey': 'SUA_API_KEY',
+                'apikey': 'napi_h1oxultl93gyplfy9bxw6titnf8x46a3jxlk1k2idu3iw2e4m1l32k6ot3cwldz0',
                 'Content-Type': 'application/json'
             }
         });
@@ -42,3 +42,4 @@ async function login() {
         msg.textContent = "Erro ao conectar com o banco de dados!";
     }
 }
+
