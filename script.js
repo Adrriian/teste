@@ -1,5 +1,5 @@
 // Substitua pela sua Publishable Client Key do Neon Auth
-const PUBLISHABLE_KEY = "SUA_PUBLICABLE_CLIENT_KEY";
+const PUBLISHABLE_KEY = "pck_gzfvbf2a5b5fgdevaqf9jh414jgz9p5t97n02v39fp5er";
 
 // URLs do Neon Auth
 const SIGNUP_URL = `https://api.neon-auth.com/v1/signup`;
@@ -98,3 +98,4 @@ window.onload = () => {
         showDashboard(name);
     }
 };
+
